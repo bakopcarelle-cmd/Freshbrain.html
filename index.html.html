@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brain Battle — Teste ton cerveau !</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg-1:#0a0e2e;
+    --bg-2:#180a3d;
+    --bg-3:#12082e;
+    --purple:#a855f7;
+    --purple-dark:#7c3aed;
+    --blue:#3b82f6;
+    --pink:#ec4899;
+    --gold:#fbbf24;
+    --teal:#22d3ee;
+    --green:#10b981;
+    --red:#f43f5e;
+    --text:#eceaff;
+    --text-dim:#9ca3d1;
+    --card-bg:rgba(14,17,48,0.72);
+    --card-border:rgba(168,85,247,0.35);
+    --glow:0 0 24px rgba(168,85,247,0.35);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *,*::before,*::after{box-sizing:inherit;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 15% 8%, rgba(168,85,247,0.20), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(59,130,246,0.20), transparent 45%),
+      radial-gradient(circle at 50% 90%, rgba(236,72,153,0.14), transparent 50%),
+      linear-gradient(160deg, var(--bg-1) 0%, var(--bg-3) 55%, var(--bg-2) 100%);
+    background-attachment:fixed;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 70% 60%, rgba(255,255,255,0.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90% 25%, rgba(255,255,255,0.4) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 55% 10%, rgba(255,255,255,0.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 10% 65%, rgba(255,255,255,0.3) 50%, transparent 51%);
+    background-size:100% 100%;
+    opacity:0.6;
+    pointer-events:none;
+    z-index:0;
+  }
+  .app{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:18px 16px 90px;}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px;}
+  .logo{display:flex; align-items:center; gap:10px;}
+  .logo-icon{font-size:34px; filter:drop-shadow(0 0 10px rgba(168,85,247,0.7));}
+  .logo-text{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; line-height:1; letter-spacing:0.5px;
+    background:linear-gradient(90deg, var(--teal), var(--purple), var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .logo-sub{font-size:11px; color:var(--text-dim); margin-top:2px;}
+
+  .tabs{display:flex; gap:8px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; padding:5px; backdrop-filter:blur(10px); overflow-x:auto;}
+  .tab-btn{
+    appearance:none; border:none; background:transparent; color:var(--text-dim);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px; padding:9px 14px; border-radius:10px;
+    cursor:pointer; white-space:nowrap; transition:background .2s,color .2s;
+  }
+  .tab-btn.active{ background:linear-gradient(135deg, var(--purple), var(--purple-dark)); color:#fff; box-shadow:var(--glow);}
+  .tab-btn:hover:not(.active){ color:#fff; background:rgba(255,255,255,0.06); }
+
+  .view{display:none;}
+  .view.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- HOME ---------- */
+  .hero{
+    text-align:center; padding:54px 16px 46px; border-radius:24px;
+    background:var(--card-bg); border:1px solid var(--card-border); box-shadow:var(--glow);
+  }
+  .hero-title{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(32px,7vw,52px); margin:0 0 6px;
+    background:linear-gradient(90deg, var(--teal), var(--purple) 55%, var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero-sub{color:var(--text-dim); font-size:15px; margin:0 0 28px;}
+  .btn-primary{
+    appearance:none; border:none; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:16px;
+    color:#fff; padding:14px 34px; border-radius:999px;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    box-shadow:0 6px 22px rgba(168,85,247,0.45); transition:transform .15s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .home-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:26px;}
+  .home-tile{background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:16px; padding:16px 10px; text-align:center;}
+  .home-tile .ico{font-size:24px;}
+  .home-tile .lbl{font-size:12.5px; color:var(--text-dim); margin-top:6px;}
+
+  /* ---------- STATS BAR ---------- */
+  .stats-bar{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
+  .stat-chip{
+    flex:1 1 130px; display:flex; align-items:center; gap:10px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; padding:10px 14px;
+  }
+  .stat-chip .ico{font-size:20px;}
+  .stat-chip .lbl{font-size:10.5px; color:var(--text-dim); text-transform:none;}
+  .stat-chip .val{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;}
+  .hearts{display:flex; gap:3px;}
+  .heart{font-size:15px; filter:drop-shadow(0 0 4px rgba(236,72,153,0.7));}
+  .heart.empty{filter:none; opacity:0.25;}
+  .level-progress-wrap{display:flex; flex-direction:column; gap:4px; flex:1 1 100%;}
+  .level-progress-bar{height:6px; border-radius:6px; background:rgba(255,255,255,0.08); overflow:hidden;}
+  .level-progress-fill{height:100%; background:linear-gradient(90deg,var(--teal),var(--purple)); transition:width .3s;}
+
+  /* ---------- GAME GRID ---------- */
+  .game-grid{display:grid; grid-template-columns:1fr 300px; gap:16px; align-items:start;}
+  @media (max-width:860px){ .game-grid{grid-template-columns:1fr;} }
+
+  .quiz-card{
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:22px; padding:22px;
+    box-shadow:var(--glow); min-height:340px; display:flex; flex-direction:column;
+  }
+  .quiz-topline{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+  .badge{font-size:12.5px; font-weight:700; padding:7px 13px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;}
+  .badge-subject{background:rgba(168,85,247,0.18); color:#d9b6ff; border:1px solid rgba(168,85,247,0.4);}
+  .badge-level{background:rgba(34,211,238,0.15); color:#8fe9fb; border:1px solid rgba(34,211,238,0.4);}
+  .question-text{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:clamp(18px,2.6vw,23px); line-height:1.4; margin:6px 0 22px;}
+  .options{display:flex; flex-direction:column; gap:12px; margin-bottom:20px;}
+  .option-btn{
+    display:flex; align-items:center; gap:14px; text-align:left;
+    background:rgba(255,255,255,0.03); border:1.5px solid rgba(120,140,220,0.28); border-radius:14px;
+    padding:13px 16px; color:var(--text); font-family:'Inter',sans-serif; font-size:14.5px; font-weight:500;
+    cursor:pointer; transition:border-color .15s, background .15s, transform .1s;
+  }
+  .option-btn:hover:not(.disabled){ border-color:var(--purple); background:rgba(168,85,247,0.10); }
+  .option-btn.selected{ border-color:var(--purple); background:rgba(168,85,247,0.18); box-shadow:0 0 0 1px var(--purple); }
+  .option-btn.correct{ border-color:var(--green); background:rgba(16,185,129,0.18); }
+  .option-btn.wrong{ border-color:var(--red); background:rgba(244,63,94,0.18); }
+  .option-btn.disabled{ cursor:not-allowed; opacity:0.55; }
+  .option-btn.hidden-by-fifty{ visibility:hidden; }
+  .option-letter{
+    flex:0 0 auto; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:13px; background:linear-gradient(135deg,var(--blue),var(--purple)); color:#fff;
+  }
+  .feedback-line{font-size:13px; color:var(--text-dim); min-height:18px; margin:-6px 0 14px;}
+  .btn-submit{
+    margin-top:auto; align-self:flex-start; appearance:none; border:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-weight:700; font-size:14.5px; color:#fff; padding:12px 30px;
+    border-radius:999px; background:linear-gradient(135deg,var(--purple),var(--pink));
+    box-shadow:0 4px 16px rgba(168,85,247,0.4); transition:transform .15s, opacity .15s;
+  }
+  .btn-submit:disabled{opacity:0.35; cursor:not-allowed; box-shadow:none;}
+  .btn-submit:hover:not(:disabled){transform:translateY(-1px);}
+
+  /* ---------- SIDE PANEL ---------- */
+  .side-panel{display:flex; flex-direction:column; gap:14px;}
+  .panel-block{ background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:14px 16px; }
+  .panel-title{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:10px; }
+  .subject-list, .level-list, .aide-list{display:flex; flex-direction:column; gap:7px;}
+  .subject-item, .level-item, .aide-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:9px 11px; border-radius:11px; border:1px solid transparent; cursor:pointer;
+    font-size:13.5px; font-weight:600; color:var(--text); background:rgba(255,255,255,0.02);
+    transition:background .15s, border-color .15s;
+  }
+  .subject-item .left, .level-item .left, .aide-item .left{display:flex; align-items:center; gap:9px;}
+  .subject-item:hover, .level-item:hover:not(.locked){ border-color:var(--card-border); background:rgba(255,255,255,0.05); }
+  .subject-item.active{ border-color:var(--purple); background:rgba(168,85,247,0.16); }
+  .level-item.active{ border-color:var(--teal); background:rgba(34,211,238,0.14); color:#bff3fc; }
+  .level-item.locked{ opacity:0.4; cursor:not-allowed; }
+  .level-num{ width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;}
+  .aide-item.disabled{ opacity:0.35; cursor:not-allowed; }
+  .aide-count{ font-size:12px; color:var(--gold); font-weight:700; }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,7,20,0.72); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    width:100%; max-width:360px; background:linear-gradient(160deg,#1a1145,#0e0a2c);
+    border:1px solid var(--card-border); border-radius:22px; padding:28px 24px; text-align:center; box-shadow:var(--glow);
+  }
+  .modal h2{font-family:'Baloo 2',sans-serif; margin:0 0 8px; font-size:24px;}
+  .modal p{color:var(--text-dim); font-size:14px; margin:0 0 20px;}
+
+  /* ---------- RANKING / SETTINGS ---------- */
+  .panel-page{ background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:22px; }
+  .ranking-item{display:flex; justify-content:space-between; align-items:center; padding:11px 4px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14px;}
+  .ranking-item:last-child{border-bottom:none;}
+  .ranking-empty{color:var(--text-dim); text-align:center; padding:24px 0; font-size:14px;}
+  .settings-row{display:flex; align-items:center; justify-content:space-between; padding:13px 4px; border-bottom:1px solid rgba(255,255,255,0.06);}
+  .settings-row:last-child{border-bottom:none;}
+  .toggle{ width:46px; height:26px; border-radius:999px; background:rgba(255,255,255,0.12); position:relative; cursor:pointer; flex:0 0 auto; }
+  .toggle.on{ background:linear-gradient(135deg,var(--purple),var(--pink)); }
+  .toggle .knob{ position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s; }
+  .toggle.on .knob{ left:23px; }
+  .btn-ghost{
+    appearance:none; cursor:pointer; font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+    color:var(--text); background:rgba(255,255,255,0.05); border:1px solid var(--card-border); border-radius:999px; padding:9px 18px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="logo">
+      <span class="logo-icon">🧠</span>
+      <div>
+        <div class="logo-text">BRAIN BATTLE</div>
+        <div class="logo-sub">Teste ton cerveau !</div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn" data-view="home">🏠 Accueil</button>
+      <button class="tab-btn" data-view="game">🎮 Jouer</button>
+      <button class="tab-btn" data-view="ranking">🏆 Classement</button>
+      <button class="tab-btn" data-view="settings">⚙️ Paramètres</button>
+    </nav>
+  </div>
+
+  <!-- HOME -->
+  <section class="view" id="view-home">
+    <div class="hero">
+      <h1 class="hero-title">Prêt à défier ton cerveau ?</h1>
+      <p class="hero-sub">Choisis une matière, grimpe les niveaux, et prouve ce que tu sais — Maths, Physique, Chimie, Informatique ou Culture générale.</p>
+      <button class="btn-primary" id="btn-play-hero">▶ Jouer</button>
+      <div class="home-grid">
+        <div class="home-tile"><div class="ico">📐</div><div class="lbl">Mathématiques</div></div>
+        <div class="home-tile"><div class="ico">⚛️</div><div class="lbl">Physique</div></div>
+        <div class="home-tile"><div class="ico">🧪</div><div class="lbl">Chimie</div></div>
+        <div class="home-tile"><div class="ico">💻</div><div class="lbl">Informatique</div></div>
+        <div class="home-tile"><div class="ico">🌍</div><div class="lbl">Culture générale</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="view" id="view-game">
+    <div class="stats-bar">
+      <div class="stat-chip"><div class="ico">⭐</div><div><div class="lbl">Score</div><div class="val" id="stat-score">0</div></div></div>
+      <div class="stat-chip"><div class="ico">❤️</div><div><div class="lbl">Vies</div><div class="hearts" id="stat-hearts"></div></div></div>
+      <div class="stat-chip"><div class="ico">⏱️</div><div><div class="lbl">Temps</div><div class="val" id="stat-timer">15</div></div></div>
+      <div class="stat-chip"><div class="ico">🧠</div><div><div class="lbl">Niveau</div><div class="val" id="stat-level">Facile</div></div></div>
+      <div class="level-progress-wrap">
+        <div class="level-progress-bar"><div class="level-progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div style="font-size:11px; color:var(--text-dim);" id="progress-label">0/3</div>
+      </div>
+    </div>
+
+    <div class="game-grid">
+      <div class="quiz-card">
+        <div class="quiz-topline">
+          <span class="badge badge-subject" id="badge-subject">📐 Mathématiques</span>
+          <span class="badge badge-level" id="badge-level">Niveau : Facile</span>
+        </div>
+        <div class="question-text" id="question-text">Chargement…</div>
+        <div class="options" id="options-wrap"></div>
+        <div class="feedback-line" id="feedback-line"></div>
+        <button class="btn-submit" id="btn-submit" disabled>Valider</button>
+      </div>
+
+      <aside class="side-panel">
+        <div class="panel-block">
+          <div class="panel-title">📚 Matière</div>
+          <div class="subject-list" id="subject-list"></div>
+        </div>
+        <div class="panel-block">
+          <div class="panel-title">📊 Niveau</div>
+          <div class="level-list" id="level-list"></div>
+        </div>
+        <div class="panel-block">
+          <div class="panel-title">💡 Aides</div>
+          <div class="aide-list">
+            <div class="aide-item" id="aide-fifty"><div class="left">👥 50/50</div><span class="aide-count">3</span></div>
+            <div class="aide-item" id="aide-friend"><div class="left">📞 Appel à un ami</div><span class="aide-count">3</span></div>
+            <div class="aide-item" id="aide-skip"><div class="left">⏭️ Question suivante</div><span class="aide-count">3</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- RANKING -->
+  <section class="view" id="view-ranking">
+    <div class="panel-page">
+      <div class="panel-title" style="font-size:14px; margin-bottom:14px;">🏆 Meilleurs scores (sur cet appareil)</div>
+      <div id="ranking-list"></div>
+      <div style="margin-top:16px;"><button class="btn-ghost" id="btn-clear-ranking">Effacer le classement</button></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings">
+    <div class="panel-page">
+      <div class="settings-row">
+        <div><div style="font-weight:600; font-size:14px;">Effets sonores</div><div style="font-size:12px; color:var(--text-dim);">Bips générés en direct (aucun fichier audio)</div></div>
+        <div class="toggle on" id="toggle-sound"><div class="knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div><div style="font-weight:600; font-size:14px;">Réinitialiser la progression</div><div style="font-size:12px; color:var(--text-dim);">Remet les niveaux, le score et les aides à zéro</div></div>
+        <button class="btn-ghost" id="btn-reset">Réinitialiser</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h2 id="modal-title">Niveau terminé !</h2>
+    <p id="modal-text">Bravo, tu peux continuer.</p>
+    <button class="btn-primary" id="modal-btn">Continuer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- DATA ---------------- */
+  var LEVELS = ["facile","moyen","difficile","expert"];
+  var LEVEL_LABELS = {facile:"Facile", moyen:"Moyen", difficile:"Difficile", expert:"Expert"};
+  var LEVEL_POINTS = {facile:10, moyen:20, difficile:30, expert:40};
+  var QUESTIONS_PER_LEVEL = 3;
+  var TIME_PER_QUESTION = 15;
+
+  var SUBJECTS = {
+    math:    {label:"Mathématiques", icon:"📐"},
+    physique:{label:"Physique",      icon:"⚛️"},
+    chimie:  {label:"Chimie",        icon:"🧪"},
+    info:    {label:"Informatique",  icon:"💻"},
+    culture: {label:"Culture générale", icon:"🌍"}
+  };
+
+  var QUESTIONS = {
+    math: [
+      {level:"facile", q:"Quelle est la dérivée de f(x) = x² ?", options:["x","2x","x²","2"], correct:1},
+      {level:"facile", q:"Combien font 7 × 8 ?", options:["54","56","64","48"], correct:1},
+      {level:"facile", q:"Quelle est la racine carrée de 81 ?", options:["7","8","9","11"], correct:2},
+      {level:"moyen", q:"Résous 2x + 5 = 15. Que vaut x ?", options:["4","5","6","10"], correct:1},
+      {level:"moyen", q:"Quelle est la dérivée de f(x) = x³ ?", options:["3x","x²","3x²","x³"], correct:2},
+      {level:"moyen", q:"π arrondi à deux décimales vaut :", options:["3,12","3,14","3,16","3,41"], correct:1},
+      {level:"difficile", q:"Quelle est la dérivée de f(x) = sin(x) ?", options:["-sin(x)","cos(x)","-cos(x)","tan(x)"], correct:1},
+      {level:"difficile", q:"Une solution de x² - 5x + 6 = 0 est :", options:["1","2","4","5"], correct:1},
+      {level:"difficile", q:"La limite de 1/x quand x → +∞ est :", options:["0","1","+∞","-1"], correct:0},
+      {level:"expert", q:"L'intégrale de 2x dx est :", options:["x + C","2x² + C","x² + C","x²/2 + C"], correct:2},
+      {level:"expert", q:"La dérivée de ln(x) est :", options:["x","1/x","ln(x)","e^x"], correct:1},
+      {level:"expert", q:"La solution générale de y' = y est :", options:["y = x + C","y = Ce^x","y = Cx","y = C/x"], correct:1}
+    ],
+    physique: [
+      {level:"facile", q:"Quelle est l'unité de la force ?", options:["Watt","Newton","Joule","Pascal"], correct:1},
+      {level:"facile", q:"La vitesse de la lumière est d'environ :", options:["30 000 km/s","150 000 km/s","300 000 km/s","1 000 000 km/s"], correct:2},
+      {level:"facile", q:"Qui a formulé la loi de la gravitation universelle ?", options:["Einstein","Newton","Galilée","Pascal"], correct:1},
+      {level:"moyen", q:"Quelle est la formule de l'énergie cinétique ?", options:["mgh","½mv²","F = ma","P = UI"], correct:1},
+      {level:"moyen", q:"Quelle est l'unité du courant électrique ?", options:["Volt","Ohm","Ampère","Watt"], correct:2},
+      {level:"moyen", q:"La loi d'Ohm s'écrit :", options:["U = RI","P = UI","F = ma","E = mc²"], correct:0},
+      {level:"difficile", q:"La formule de la relativité restreinte pour l'énergie est :", options:["E = mc","E = mc²","E = ½mc²","E = mgh"], correct:1},
+      {level:"difficile", q:"Quelle particule porte la charge électrique négative élémentaire ?", options:["Le proton","Le neutron","L'électron","Le photon"], correct:2},
+      {level:"difficile", q:"L'unité de la fréquence est :", options:["Newton","Hertz","Volt","Tesla"], correct:1},
+      {level:"expert", q:"Le principe d'incertitude de Heisenberg relie :", options:["Masse et vitesse","Position et quantité de mouvement","Charge et champ","Temps et énergie seulement"], correct:1},
+      {level:"expert", q:"La constante de Planck est de l'ordre de :", options:["6,63×10⁻³⁴ J·s","3×10⁸ m/s","6,02×10²³","9,8 m/s²"], correct:0},
+      {level:"expert", q:"Le boson de Higgs est associé à :", options:["La masse des particules","La charge électrique","Le spin nucléaire","La gravité quantique"], correct:0}
+    ],
+    chimie: [
+      {level:"facile", q:"Quel est le symbole chimique de l'eau ?", options:["O2","H2O","CO2","NaCl"], correct:1},
+      {level:"facile", q:"Combien de protons possède l'atome d'hydrogène ?", options:["0","1","2","3"], correct:1},
+      {level:"facile", q:"Quel gaz respirons-nous principalement ?", options:["Azote","Dioxygène","CO2","Hydrogène"], correct:1},
+      {level:"moyen", q:"Quel est le symbole chimique du sodium ?", options:["S","So","Na","Sd"], correct:2},
+      {level:"moyen", q:"Le pH d'une solution neutre est de :", options:["0","7","14","1"], correct:1},
+      {level:"moyen", q:"Combien d'électrons possède un atome de carbone neutre ?", options:["4","6","8","12"], correct:1},
+      {level:"difficile", q:"La configuration électronique de l'oxygène (Z=8) est :", options:["1s²2s²2p⁴","1s²2s²2p⁶","1s²2s²2p²","1s²2s⁴"], correct:0},
+      {level:"difficile", q:"Une réaction exothermique :", options:["Absorbe de la chaleur","Dégage de la chaleur","Ne change pas la température","Produit un gaz"], correct:1},
+      {level:"difficile", q:"Le nombre d'Avogadro est de l'ordre de :", options:["6,02×10²³","3,14×10⁸","9,81×10²","1,6×10⁻¹⁹"], correct:0},
+      {level:"expert", q:"Un catalyseur est une substance qui :", options:["Est consommée par la réaction","Ralentit la réaction","Accélère la réaction sans être consommée","Change la couleur seulement"], correct:2},
+      {level:"expert", q:"La loi des gaz parfaits s'écrit :", options:["PV = nRT","E = mc²","F = ma","U = RI"], correct:0},
+      {level:"expert", q:"L'électronégativité mesure :", options:["La masse d'un atome","La capacité à attirer les électrons","Le nombre de neutrons","La taille du noyau"], correct:1}
+    ],
+    info: [
+      {level:"facile", q:"Que signifie le sigle \"IA\" ?", options:["Interface Application","Intelligence Artificielle","Internet Avancé","Info Automatique"], correct:1},
+      {level:"facile", q:"Quel langage structure une page web ?", options:["CSS","HTML","Python","SQL"], correct:1},
+      {level:"facile", q:"Combien de bits contient un octet ?", options:["4","8","16","32"], correct:1},
+      {level:"moyen", q:"Que signifie \"CPU\" ?", options:["Central Processing Unit","Computer Power Unit","Control Program Utility","Central Program Use"], correct:0},
+      {level:"moyen", q:"Quel langage gère le style visuel d'une page web ?", options:["HTML","CSS","JS","PHP"], correct:1},
+      {level:"moyen", q:"Que signifie \"RAM\" ?", options:["Mémoire vive","Disque dur","Carte graphique","Processeur"], correct:0},
+      {level:"difficile", q:"Quelle structure suit le principe \"premier entré, premier sorti\" ?", options:["Une pile (stack)","Une file (queue)","Un arbre","Un graphe"], correct:1},
+      {level:"difficile", q:"Que signifie \"API\" ?", options:["Interface de Programmation d'Application","Application Privée Interne","Automated Program Interface","Analyse Programmée Informatique"], correct:0},
+      {level:"difficile", q:"Le rôle d'un algorithme de tri est de :", options:["Chiffrer des données","Ordonner des données","Compresser un fichier","Afficher une image"], correct:1},
+      {level:"expert", q:"La complexité O(n log n) correspond typiquement à :", options:["Une recherche linéaire","Un tri efficace comme le tri fusion","Un accès direct en mémoire","Une boucle infinie"], correct:1},
+      {level:"expert", q:"Un réseau de neurones artificiels est :", options:["Un circuit électrique du cerveau","Un modèle inspiré du cerveau pour apprendre des motifs","Un type de base de données","Un protocole réseau"], correct:1},
+      {level:"expert", q:"\"Machine learning\" signifie :", options:["Apprentissage automatique à partir de données","Fabrication de machines","Réparation informatique","Langage de programmation"], correct:0}
+    ],
+    culture: [
+      {level:"facile", q:"Quelle est la capitale du Cameroun ?", options:["Douala","Yaoundé","Bafoussam","Garoua"], correct:1},
+      {level:"facile", q:"Combien de continents compte-t-on généralement ?", options:["4","5","6","9"], correct:2},
+      {level:"facile", q:"Quel est le plus grand océan du monde ?", options:["Atlantique","Indien","Arctique","Pacifique"], correct:3},
+      {level:"moyen", q:"En quelle année le Cameroun a-t-il obtenu son indépendance ?", options:["1955","1960","1965","1975"], correct:1},
+      {level:"moyen", q:"Qui a peint la Joconde ?", options:["Michel-Ange","Léonard de Vinci","Picasso","Raphaël"], correct:1},
+      {level:"moyen", q:"Quelle est la langue avec le plus de locuteurs natifs au monde ?", options:["L'anglais","L'espagnol","Le mandarin","Le français"], correct:2},
+      {level:"difficile", q:"Quel traité a officiellement mis fin à la Première Guerre mondiale ?", options:["Traité de Versailles","Traité de Rome","Traité de Vienne","Traité de Paris"], correct:0},
+      {level:"difficile", q:"Quelle organisation regroupe les pays du continent africain ?", options:["ONU","Union Africaine","OTAN","UE"], correct:1},
+      {level:"difficile", q:"Qui a écrit \"Une saison au Congo\" ?", options:["Aimé Césaire","Victor Hugo","Léopold Sédar Senghor","Mongo Beti"], correct:0},
+      {level:"expert", q:"Le franc CFA est la monnaie commune de plusieurs pays :", options:["D'Asie du Sud-Est","D'Afrique centrale et de l'Ouest","D'Amérique latine","D'Europe de l'Est"], correct:1},
+      {level:"expert", q:"Quel est le plus long fleuve d'Afrique ?", options:["Le Congo","Le Niger","Le Nil","Le Zambèze"], correct:2},
+      {level:"expert", q:"En quelle année l'Union Africaine a-t-elle été créée ?", options:["1963","1994","2002","2010"], correct:2}
+    ]
+  };
+
+  /* ---------------- STATE ---------------- */
+  var state = {
+    subject:"math",
+    level:"facile",
+    qIndex:0,
+    pool:[],
+    score:0,
+    lives:3,
+    timer:TIME_PER_QUESTION,
+    timerId:null,
+    selected:null,
+    answered:false,
+    aides:{fifty:3, friend:3, skip:3},
+    unlocked:{math:["facile"], physique:["facile"], chimie:["facile"], info:["facile"], culture:["facile"]},
+    soundOn:true
+  };
+
+  /* ---------------- STORAGE ---------------- */
+  function loadHighscores(){
+    try{
+      var raw = window.localStorage.getItem("brainbattle_scores");
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveHighscore(entry){
+    try{
+      var list = loadHighscores();
+      list.push(entry);
+      list.sort(function(a,b){ return b.score - a.score; });
+      list = list.slice(0,10);
+      window.localStorage.setItem("brainbattle_scores", JSON.stringify(list));
+    }catch(e){ /* stockage indisponible, on continue sans persister */ }
+  }
+  function clearHighscores(){
+    try{ window.localStorage.removeItem("brainbattle_scores"); }catch(e){}
+  }
+
+  /* ---------------- SOUND (Web Audio, sans fichier) ---------------- */
+  var audioCtx = null;
+  function beep(freq, duration){
+    if(!state.soundOn) return;
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.value = 0.08;
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration);
+    }catch(e){ /* audio indisponible */ }
+  }
+
+  /* ---------------- DOM refs ---------------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var tabs = document.querySelectorAll(".tab-btn");
+  var views = document.querySelectorAll(".view");
+
+  function switchView(name){
+    views.forEach(function(v){ v.classList.toggle("active", v.id === "view-" + name); });
+    tabs.forEach(function(t){ t.classList.toggle("active", t.dataset.view === name); });
+    if(name === "game" && state.pool.length === 0){ startLevel(state.subject, state.level); }
+  }
+  tabs.forEach(function(t){ t.addEventListener("click", function(){ switchView(t.dataset.view); }); });
+  $("btn-play-hero").addEventListener("click", function(){ switchView("game"); });
+
+  /* ---------------- RENDER: side panel lists ---------------- */
+  function renderSubjectList(){
+    var el = $("subject-list"); el.innerHTML = "";
+    Object.keys(SUBJECTS).forEach(function(key){
+      var s = SUBJECTS[key];
+      var div = document.createElement("div");
+      div.className = "subject-item" + (key === state.subject ? " active" : "");
+      div.innerHTML = '<div class="left">'+s.icon+' '+s.label+'</div>';
+      div.addEventListener("click", function(){
+        state.subject = key;
+        var firstUnlocked = state.unlocked[key][state.unlocked[key].length-1];
+        startLevel(key, firstUnlocked);
+      });
+      el.appendChild(div);
+    });
+  }
+
+  function renderLevelList(){
+    var el = $("level-list"); el.innerHTML = "";
+    LEVELS.forEach(function(lv, i){
+      var unlocked = state.unlocked[state.subject].indexOf(lv) !== -1;
+      var div = document.createElement("div");
+      div.className = "level-item" + (lv === state.level ? " active" : "") + (unlocked ? "" : " locked");
+      div.innerHTML = '<div class="left"><span class="level-num">'+(i+1)+'</span>'+LEVEL_LABELS[lv]+'</div>' + (unlocked ? "" : "🔒");
+      if(unlocked){
+        div.addEventListener("click", function(){ startLevel(state.subject, lv); });
+      }
+      el.appendChild(div);
+    });
+  }
+
+  function renderAides(){
+    var map = {fifty:"aide-fifty", friend:"aide-friend", skip:"aide-skip"};
+    Object.keys(map).forEach(function(k){
+      var el = $(map[k]);
+      var count = state.aides[k];
+      el.querySelector(".aide-count").textContent = count;
+      el.classList.toggle("disabled", count <= 0);
+    });
+  }
+
+  /* ---------------- GAME FLOW ---------------- */
+  function startLevel(subject, level){
+    stopTimer();
+    state.subject = subject;
+    state.level = level;
+    state.pool = QUESTIONS[subject].filter(function(q){ return q.level === level; }).slice(0, QUESTIONS_PER_LEVEL);
+    state.qIndex = 0;
+    renderSubjectList();
+    renderLevelList();
+    renderAides();
+    renderHeader();
+    loadQuestion();
+  }
+
+  function renderHeader(){
+    $("stat-score").textContent = state.score;
+    $("stat-level").textContent = LEVEL_LABELS[state.level];
+    var hearts = "";
+    for(var i=0;i<3;i++){ hearts += '<span class="heart'+(i < state.lives ? "" : " empty")+'">❤️</span>'; }
+    $("stat-hearts").innerHTML = hearts;
+    $("badge-subject").textContent = SUBJECTS[state.subject].icon + " " + SUBJECTS[state.subject].label;
+    $("badge-level").textContent = "Niveau : " + LEVEL_LABELS[state.level];
+    var pct = Math.round((state.qIndex / state.pool.length) * 100);
+    $("progress-fill").style.width = pct + "%";
+    $("progress-label").textContent = state.qIndex + "/" + state.pool.length;
+  }
+
+  function loadQuestion(){
+    state.answered = false;
+    state.selected = null;
+    state.timer = TIME_PER_QUESTION;
+    renderHeader();
+    var q = state.pool[state.qIndex];
+    if(!q){ return; }
+    $("question-text").textContent = q.q;
+    $("feedback-line").textContent = "";
+    var wrap = $("options-wrap"); wrap.innerHTML = "";
+    var letters = ["A","B","C","D"];
+    q.options.forEach(function(opt, idx){
+      var btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.dataset.idx = idx;
+      btn.innerHTML = '<span class="option-letter">'+letters[idx]+'</span><span class="option-text">'+opt+'</span>';
+      btn.addEventListener("click", function(){
+        if(state.answered) return;
+        wrap.querySelectorAll(".option-btn").forEach(function(b){ b.classList.remove("selected"); });
+        btn.classList.add("selected");
+        state.selected = idx;
+        $("btn-submit").disabled = false;
+      });
+      wrap.appendChild(btn);
+    });
+    $("btn-submit").disabled = true;
+    startTimer();
+  }
+
+  function startTimer(){
+    stopTimer();
+    $("stat-timer").textContent = state.timer;
+    state.timerId = window.setInterval(function(){
+      state.timer -= 1;
+      $("stat-timer").textContent = Math.max(state.timer,0);
+      if(state.timer <= 0){
+        stopTimer();
+        submitAnswer(true);
+      }
+    }, 1000);
+  }
+  function stopTimer(){
+    if(state.timerId){ window.clearInterval(state.timerId); state.timerId = null; }
+  }
+
+  $("btn-submit").addEventListener("click", function(){ submitAnswer(false); });
+
+  function submitAnswer(timedOut){
+    if(state.answered) return;
+    state.answered = true;
+    stopTimer();
+    var q = state.pool[state.qIndex];
+    var wrap = $("options-wrap");
+    var buttons = wrap.querySelectorAll(".option-btn");
+    buttons.forEach(function(b){ b.classList.add("disabled"); });
+
+    var correctIdx = q.correct;
+    var isCorrect = (!timedOut) && (state.selected === correctIdx);
+
+    buttons[correctIdx].classList.add("correct");
+    if(!isCorrect && state.selected !== null && !timedOut){
+      buttons[state.selected].classList.add("wrong");
+    }
+
+    if(isCorrect){
+      state.score += LEVEL_POINTS[state.level];
+      $("feedback-line").textContent = "✅ Bonne réponse ! +" + LEVEL_POINTS[state.level] + " points";
+      beep(880, 0.15);
+    } else {
+      state.lives -= 1;
+      $("feedback-line").textContent = timedOut ? "⏱️ Temps écoulé !" : "❌ Mauvaise réponse.";
+      beep(180, 0.25);
+    }
+    renderHeader();
+
+    window.setTimeout(function(){
+      if(state.lives <= 0){
+        endGame();
+        return;
+      }
+      advanceQuestion();
+    }, 1100);
+  }
+
+  function advanceQuestion(){
+    state.qIndex += 1;
+    if(state.qIndex >= state.pool.length){
+      completeLevel();
+    } else {
+      loadQuestion();
+    }
+  }
+
+  function completeLevel(){
+    var idx = LEVELS.indexOf(state.level);
+    var next = LEVELS[idx+1];
+    if(next && state.unlocked[state.subject].indexOf(next) === -1){
+      state.unlocked[state.subject].push(next);
+    }
+    renderLevelList();
+    saveHighscore({subject:SUBJECTS[state.subject].label, level:LEVEL_LABELS[state.level], score:state.score, date:new Date().toLocaleDateString("fr-FR")});
+    showModal(
+      "🎉 Niveau terminé !",
+      next ? "Bravo, tu as terminé le niveau " + LEVEL_LABELS[state.level] + ". Le niveau " + LEVEL_LABELS[next] + " est débloqué !" : "Tu as terminé tous les niveaux de cette matière, bravo champion !",
+      function(){
+        if(next){ startLevel(state.subject, next); }
+        else { switchView("home"); }
+      }
+    );
+  }
+
+  function endGame(){
+    saveHighscore({subject:SUBJECTS[state.subject].label, level:LEVEL_LABELS[state.level], score:state.score, date:new Date().toLocaleDateString("fr-FR")});
+    showModal(
+      "💥 Partie terminée",
+      "Tu n'as plus de vies. Score final : " + state.score + " points.",
+      function(){ resetRun(); switchView("home"); }
+    );
+  }
+
+  function resetRun(){
+    state.score = 0;
+    state.lives = 3;
+    state.aides = {fifty:3, friend:3, skip:3};
+    startLevel(state.subject, "facile");
+  }
+
+  function showModal(title, text, onContinue){
+    $("modal-title").textContent = title;
+    $("modal-text").textContent = text;
+    $("modal-overlay").classList.add("active");
+    var btn = $("modal-btn");
+    var handler = function(){
+      $("modal-overlay").classList.remove("active");
+      btn.removeEventListener("click", handler);
+      onContinue();
+    };
+    btn.addEventListener("click", handler);
+  }
+
+  /* ---------------- AIDES ---------------- */
+  $("aide-fifty").addEventListener("click", function(){
+    if(state.answered || state.aides.fifty <= 0) return;
+    state.aides.fifty -= 1; renderAides();
+    var q = state.pool[state.qIndex];
+    var wrap = $("options-wrap");
+    var buttons = wrap.querySelectorAll(".option-btn");
+    var wrongIdxs = [];
+    buttons.forEach(function(b,i){ if(i !== q.correct) wrongIdxs.push(i); });
+    // cache deux mauvaises réponses au hasard
+    wrongIdxs.sort(function(){ return Math.random()-0.5; });
+    wrongIdxs.slice(0,2).forEach(function(i){ buttons[i].classList.add("hidden-by-fifty"); buttons[i].classList.add("disabled"); });
+  });
+
+  $("aide-friend").addEventListener("click", function(){
+    if(state.answered || state.aides.friend <= 0) return;
+    state.aides.friend -= 1; renderAides();
+    var q = state.pool[state.qIndex];
+    var letters = ["A","B","C","D"];
+    $("feedback-line").textContent = "📞 Ton ami pense que la réponse est plutôt " + letters[q.correct] + "… mais il n'est pas sûr à 100% !";
+  });
+
+  $("aide-skip").addEventListener("click", function(){
+    if(state.answered || state.aides.skip <= 0) return;
+    state.aides.skip -= 1; renderAides();
+    stopTimer();
+    state.answered = true;
+    $("feedback-line").textContent = "⏭️ Question passée, sans pénalité.";
+    window.setTimeout(function(){ advanceQuestion(); }, 500);
+  });
+
+  /* ---------------- RANKING ---------------- */
+  function renderRanking(){
+    var list = loadHighscores();
+    var el = $("ranking-list");
+    if(list.length === 0){
+      el.innerHTML = '<div class="ranking-empty">Aucune partie enregistrée pour l\'instant. Joue pour apparaître ici !</div>';
+      return;
+    }
+    el.innerHTML = list.map(function(item, i){
+      return '<div class="ranking-item"><span>#'+(i+1)+' — '+item.subject+' ('+item.level+')</span><strong>'+item.score+' pts</strong></div>';
+    }).join("");
+  }
+  document.querySelector('[data-view="ranking"]').addEventListener("click", renderRanking);
+  $("btn-clear-ranking").addEventListener("click", function(){
+    clearHighscores(); renderRanking();
+  });
+
+  /* ---------------- SETTINGS ---------------- */
+  $("toggle-sound").addEventListener("click", function(){
+    state.soundOn = !state.soundOn;
+    $("toggle-sound").classList.toggle("on", state.soundOn);
+  });
+  $("btn-reset").addEventListener("click", function(){
+    state.unlocked = {math:["facile"], physique:["facile"], chimie:["facile"], info:["facile"], culture:["facile"]};
+    resetRun();
+    switchView("home");
+  });
+
+  /* ---------------- INIT ---------------- */
+  renderSubjectList();
+  renderLevelList();
+  renderAides();
+  renderHeader();
+  switchView("home");
+})();
+</script>
+</body>
+</html>
